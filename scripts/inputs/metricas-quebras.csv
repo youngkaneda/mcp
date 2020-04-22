@@ -1,0 +1,11 @@
+project,breaks count,wmc,lcom
+collections,6,16.306,0.117
+freecs,0,40.459,0.566
+jext,9,15.547,0.182
+jgrapht,3,8.08,0.12
+quartz,1,21.398,0.196
+jedit,4,21.834,0.198
+jfreechart,13,22.972,0.172
+marauroa,1,12.721,0.18
+pmd,7,17.594,0.114
+quickserver,0,20.031,0.258

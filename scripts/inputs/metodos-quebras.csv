@@ -1,0 +1,10 @@
+methods,breaks count
+put,16
+putAll,4
+remove,7
+removeAll,1
+retainAll,1
+add,11
+set,1
+push,1
+addAll,2

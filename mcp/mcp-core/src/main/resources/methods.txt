@@ -1,0 +1,1 @@
+add, addAll, clear, remove, removeAll, retainAll, pollFirst, pollLast, replaceAll, set, sort, offer, poll, addFirst, addLast, offerFirst, offerLast, removeFirst, removeLast, removeFirstOccurrence, removeLastOccurrence, push, pop, put, replace, putAll, putIfAbsent, computeIfAbsent, computeIfPresent, compute, merge, pollFirstEntry, pollLastEntry
