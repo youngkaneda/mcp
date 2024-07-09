@@ -1,34 +1,82 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <!-- jQuery library -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <!-- Latest compiled JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="http://visjs.org/dist/vis.js"></script>
-        <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css"/>
         <style type="text/css">
+            body {
+                display: flex;
+            }
+
             #graph {
-                margin-top: 1%;
-                position: fixed;
-                width: 800px;
-                height: 600px;
+                margin: 1% 0 0 1%;
+                min-height: 94vh;
+                max-height: 94vh;
+                max-width: 70vw;
+                min-width: 70vw;
                 border: 1px solid lightgray;
             }
+
             #nodes {
-                float: right;
+                padding-left: 1%;
+                max-width: 25vw;
             }
+
             p {
                 word-wrap: break-word;
             }
+
+            h3 {
+                margin: 5% 0 2% 0;
+            }
+
+            input {
+                margin-top: 15px;
+            }
+
+            #searchInfo {
+                display: flex;
+                flex-direction: column;
+            }
+
+            #searchResult {
+                margin-top: 5%;
+                padding: 2%;
+                max-height: 50vh;
+                overflow: scroll;
+            }
+
+            .methodEntry:hover {
+                cursor: pointer;
+                border: 1px solid black;
+                padding: 2% 1% 2% 1%;
+                border-radius: 3px;
+            }
+
+            #clickResult {
+                margin-top: 2%;
+            }
         </style>
     </head>
-    <body class="container-fluid">
-        <div id="graph" class="col-md-6"></div>
-        <div id="nodes" class="col-md-6"></div>
-        <script src="script.js" type="text/javascript"></script>
-        <script type="text/javascript"></script>
+    <body>
+    <div id="graph"></div>
+    <div id="nodes">
+        <div id="selectedInfo">
+            <h3>Selected node info:</h3>
+            <span>(click in any node on the graph)</span>
+            <div id="clickResult">
+            </div>
+        </div>
+        <div id="searchInfo">
+            <h3>Search node by method name:</h3>
+            <span>(you can click in the resulting nodes and it will zoom it on the graph)</span>
+            <input id="sip" type="text" oninput="searchMethodByName()">
+            <div id="searchResult">
+            </div>
+        </div>
+    </div>
+    <script src="script.js" type="text/javascript"></script>
     </body>
 </html>

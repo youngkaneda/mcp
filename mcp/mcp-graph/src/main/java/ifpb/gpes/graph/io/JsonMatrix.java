@@ -1,6 +1,7 @@
 package ifpb.gpes.graph.io;
 
 import ifpb.gpes.graph.Matrix;
+import ifpb.gpes.graph.Node;
 
 import java.io.*;
 import java.nio.file.*;
@@ -34,35 +35,35 @@ public class JsonMatrix {
 
     private static String edgesToJson(Matrix matrix) {
         int[][] matrixs = matrix.toArray();
-        String array = IntStream.range(0, matrixs.length)
-                .mapToObj(x -> IntStream.range(0, matrixs.length)
+        return IntStream.range(0, matrixs.length)
+            .mapToObj(x -> IntStream.range(0, matrixs.length)
                 .filter(f -> matrixs[x][f] != 0)
                 .mapToObj(y -> new EdgeVis(x, y, matrixs[x][y]))
                 .collect(Collectors.toList()))
-                .flatMap(v -> v.stream())
-                .map(EdgeVis::toJson)
-                .collect(Collectors.joining(", ", "[", "]"));
-        return array;
+            .flatMap(v -> v.stream())
+            .map(EdgeVis::toJson)
+            .collect(Collectors.joining(", ", "[", "]"));
     }
 
     private String nodesToJson(Matrix matrix, List<Integer> indices) {
         String[] namesColumns = matrix.namesColumns();
-        String collect = IntStream.range(0, namesColumns.length)
-                .filter(this.matrix::conectado)
-                .mapToObj(new IntFunction<String>() {
-                    @Override
-                    public String apply(int i) {
-                    if (indices.contains(i)) {
-                        return String.format("{\"id\":\"%d\", \"label\":\"%s\","
-                                + "\"color\":{\"border\": \"black\", \"background\": \"red\"}}",
-                                i, String.valueOf(i));
-                    }
-                        return String.format("{\"id\":\"%d\", \"label\":\"%s\"}",
-                                i, String.valueOf(i));
-                    }
-                })
-                .collect(Collectors.joining(", ", "[", "]"));
-        return collect;
+        return IntStream.range(0, namesColumns.length)
+            .filter(this.matrix::conectado)
+            .mapToObj((i) -> {
+                Node node = matrix.getColumns()[i];
+                if (indices.contains(i)) {
+                    return String.format("{\"id\":\"%d\", \"label\":\"%s\", \"methodName\": \"%s\", \"className\": \"%s\", \"invokedBy\": \"%s\", "
+                        + "\"font\": {\"color\": \"white\", \"bold\": true}, \"color\": {\"border\": \"black\", \"background\": \"red\"}}",
+                        i, i, normalizeToJson(node.getMethodName()), normalizeToJson(node.getClassName()), normalizeToJson(node.getInvokedBy()));
+                }
+                return String.format("{\"id\":\"%d\", \"label\":\"%s\", \"methodName\": \"%s\", \"className\": \"%s\", \"invokedBy\": \"%s\"}",
+                    i, i, normalizeToJson(node.getMethodName()), normalizeToJson(node.getClassName()), normalizeToJson(node.getInvokedBy()));
+            })
+            .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    public String normalizeToJson(String value) {
+        return value == null ? "" : value.replace("\"", "\\\"");
     }
 
     private void generateFiles(String nodes, String edges, String[] namesColumns, String outputDir) {
@@ -72,14 +73,8 @@ public class JsonMatrix {
         //
         String elementsFile = "{" + "\"nodes\":" + nodes + "," + "\"edges\":" + edges + "}";
         createJson(elementsFile, elements);
-        //
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("script.js");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        StringBuffer buffer = reader.lines().collect(StringBuffer::new, StringBuffer::append, StringBuffer::append);
-        buffer.append("ns.innerHTML = `" + colunasFormatadasHtml(namesColumns) + "`;");
-        createScript(buffer.toString(), script);
-        //
-        createPageCopy(page);
+        createFileCopy(page, "graph.html");
+        createFileCopy(script, "script.js");
     }
 
     private void createJson(String texto, Path path) {
@@ -90,17 +85,9 @@ public class JsonMatrix {
         }
     }
 
-    private void createScript(String texto, Path path) {
+    private void createFileCopy(Path path, String resourceFilename) {
         try {
-            Files.write(path, texto.getBytes());
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "problem writing file, the directory was not found or not exist.");
-        }
-    }
-
-    private void createPageCopy(Path path) {
-        try {
-            InputStream stream = getClass().getClassLoader().getResourceAsStream("graph.html");
+            InputStream stream = getClass().getClassLoader().getResourceAsStream(resourceFilename);
             Files.copy(stream, path, REPLACE_EXISTING);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "problem writing file, probably the directory was not found or not exist.");
@@ -109,17 +96,17 @@ public class JsonMatrix {
 
     private String colunas(String[] namesColumns) {
         String collect = IntStream.range(0, namesColumns.length)
-                .mapToObj(x -> String.format("%d - %s", x, namesColumns[x]))
-                .collect(Collectors.joining(" "));
+            .mapToObj(x -> String.format("%d - %s", x, namesColumns[x]))
+            .collect(Collectors.joining(" "));
         return collect;
     }
 
     private String colunasFormatadasHtml(String[] namesColumns) {
         return IntStream.range(0, namesColumns.length)
-                .mapToObj(x -> String.format("<p class=\"col-md-4\"><span class=\"badge\">%d</span> %s</p>", x, namesColumns[x]))
-                .collect(Collectors.joining(""));
+            .mapToObj(x -> String.format("<p class=\"col-md-4\"><span class=\"badge\">%d</span> %s</p>", x, namesColumns[x]))
+            .collect(Collectors.joining(""));
     }
-    
+
     private static class EdgeVis {
 
         private final String from;
@@ -139,8 +126,8 @@ public class JsonMatrix {
 
         private EdgeVis(int from, int to, int label) {
             this(String.valueOf(from),
-                    String.valueOf(to),
-                    String.valueOf(label));
+                String.valueOf(to),
+                String.valueOf(label));
         }
 
         @Override
@@ -149,9 +136,7 @@ public class JsonMatrix {
         }
 
         public String toJson() {
-            return String.format("{\"from\":\"%s\", "
-                    + "\"to\":\"%s\", \"arrows\":\"to\", \"label\":\"%s\"}",
-                    from, to, label);
+            return String.format("{\"from\":\"%s\", \"to\":\"%s\", \"arrows\":\"to\", \"label\":\"%s\"}", from, to, label);
         }
     }
 }
